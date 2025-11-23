@@ -1,8 +1,8 @@
 # ES-Hangul Java
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java Version](https://img.shields.io/badge/Java-17%2B-blue.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2%2B-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Java Version](https://img.shields.io/badge/Java-21%2B-blue.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0%2B-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
 > ☕ A Java/Spring Boot port of [Toss's es-hangul](https://github.com/toss/es-hangul)  
 > Modern Korean text processing library with intuitive API
@@ -28,6 +28,9 @@ We aim to bring the same powerful Korean text processing capabilities to the Jav
 This project is inspired by and maintains API compatibility with:
 - [es-hangul](https://github.com/toss/es-hangul) - Original JavaScript implementation by Toss team
 - Special thanks to the Toss Frontend Chapter for their excellent work on Korean text processing
+
+## Thanks to
+
 
 ## License
 
