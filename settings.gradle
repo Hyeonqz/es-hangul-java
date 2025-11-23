@@ -1,0 +1,4 @@
+rootProject.name = 'es-hangul-java'
+include 'es-hangul-core'
+include 'es-hangul-spring-boot-starter'
+include 'es-hangul-examples'
