@@ -4,7 +4,7 @@
 [![Java Version](https://img.shields.io/badge/Java-21%2B-blue.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0%2B-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
-> ☕ A Java/Spring Boot port of [Toss's es-hangul](https://github.com/toss/es-hangul)  
+> A Java/Spring Boot port of [Toss's es-hangul](https://github.com/toss/es-hangul)  
 > Modern Korean text processing library with intuitive API
 
 ## About
@@ -30,16 +30,61 @@ We aim to bring the same powerful Korean text processing capabilities to the Jav
 
 ## Installation
 
-### Gradle
+### Core Library (Gradle)
 ```gradle
 dependencies {
     implementation 'io.github.hyeonqz:es-hangul-core:1.0.0'
 }
 ```
 
+### Spring Boot Starter (Gradle)
+```gradle
+dependencies {
+    implementation 'io.github.hyeonqz:es-hangul-spring-boot-starter:1.0.0'
+}
+```
+
 ### Maven
 ```xml
+<!-- Core Library -->
 <dependency>
+    <groupId>io.github.hyeonqz</groupId>
+    <artifactId>es-hangul-core</artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+<!-- Spring Boot Starter -->
+<dependency>
+    <groupId>io.github.hyeonqz</groupId>
+    <artifactId>es-hangul-spring-boot-starter</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+## Quick Start
+
+### For Spring Boot Applications
+
+Spring Boot Starter를 사용하면 `HangulService`가 자동으로 Bean으로 등록됩니다.
+
+```java
+@RestController
+public class HangulController {
+
+    private final HangulService hangulService;
+
+    public HangulController(HangulService hangulService) {
+        this.hangulService = hangulService;
+    }
+
+    @GetMapping("/josa")
+    public String addJosa(@RequestParam String word) {
+        return hangulService.josa(word, HangulJosa.JosaOption.이_가);
+    }
+}
+```
+
+### For Plain Java Applications
     <groupId>io.github.hyeonqz</groupId>
     <artifactId>es-hangul-core</artifactId>
     <version>1.0.0</version>
