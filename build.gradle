@@ -1,34 +1,110 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id 'java-library'
-    id 'maven-publish'
+    id 'com.vanniktech.maven.publish' version '0.28.0'
 }
 
-group = 'io.github.Hyeonqz'
-version = '1.0.0'
+ext {
+    groupName = 'io.github.hyeonqz'
+    versionName = '1.0.0'
+
+    // 배포 대상 모듈 목록
+    publishModules = ['es-hangul-core', 'es-hangul-spring-boot-starter']
+}
 
 allprojects {
-    group = 'io.github.yourusername'
-    version = '1.0.0'
+    group = groupName
+    version = versionName
 
     repositories {
         mavenCentral()
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-test {
-    useJUnitPlatform()
-}
-
 subprojects {
+    apply plugin: 'java-library'
 
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    // 배포 대상 모듈만 설정 적용
+    if (project.name in rootProject.ext.publishModules) {
+        apply plugin: 'com.vanniktech.maven.publish'
+
+        mavenPublishing {
+            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+            signAllPublications()
+
+            coordinates(groupName, project.name, versionName)
+
+            pom {
+                name = project.name
+                description = getModuleDescription(project.name)
+                inceptionYear = '2024'
+                url = 'https://github.com/Hyeonqz/es-hangul-java'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'Hyeonqz'
+                        name = 'Hyeonkyu Jin'
+                        email = 'jinhyeonkyu@gmail.com'
+                        url = 'https://github.com/Hyeonqz'
+                    }
+                }
+
+                scm {
+                    url = 'https://github.com/Hyeonqz/es-hangul-java'
+                    connection = 'scm:git:git://github.com/Hyeonqz/es-hangul-java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/Hyeonqz/es-hangul-java.git'
+                }
+            }
+        }
+    }
+}
+
+// 모듈별 설명 정의
+def getModuleDescription(String moduleName) {
+    def descriptions = [
+            'es-hangul-core': 'Core library for Korean text processing - A Java port of es-hangul developed by Toss',
+            'es-hangul-spring-boot-starter': 'Spring Boot starter for es-hangul - Auto-configuration for Korean text processing'
+    ]
+    return descriptions[moduleName] ?: 'ES-Hangul Java Library'
+}
+
+// 배포 전용 태스크 추가
+tasks.register('publishAll') {
+    group = 'publishing'
+    description = 'Publishes all configured modules to Maven Central'
+
+    dependsOn subprojects.findAll {
+        it.name in rootProject.ext.publishModules
+    }.collect {
+        it.tasks.named('publishAndReleaseToMavenCentral')
+    }
+
+    doLast {
+        println """
+        ========================================
+        배포 완료!
+        ========================================
+        배포된 모듈:
+        ${rootProject.ext.publishModules.collect { "  - ${groupName}:${it}:${versionName}" }.join('\n')}
+        
+        Maven Central 동기화까지 약 10분~2시간 소요됩니다.
+        확인: https://central.sonatype.com/
+        ========================================
+        """
+    }
 }

@@ -1,11 +1,11 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'org.springframework.boot' version '4.0.0'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'io.github.Hyeonqz'
-version = '1.0-SNAPSHOT'
+group = rootProject.group
+version = rootProject.version
 
 ext {
     springBootVersion = '4.0.0'
@@ -16,15 +16,23 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-
-    implementation project(':es-hangul-core')
+    api 'org.springframework.boot:spring-boot-starter'
+    api project(':es-hangul-core')
 
     // test
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// Starter는 실행 가능한 애플리케이션이 아니므로 bootJar 비활성화
+tasks.named('bootJar') {
+    enabled = false
+}
+
+tasks.named('jar') {
+    enabled = true
 }
 
 test {
