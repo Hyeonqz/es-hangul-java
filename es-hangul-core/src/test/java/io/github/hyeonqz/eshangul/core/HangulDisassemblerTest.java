@@ -31,10 +31,10 @@ class HangulDisassemblerTest {
     }
 
     @Test
-    @DisplayName("disassemble: 사과 -> ㅅㅏㄱㅘ")
+    @DisplayName("disassemble: 사과 -> ㅅㅏㄱㅗㅏ")
     void testDisassemble_사과() {
         String result = HangulDisassembler.disassemble("사과");
-        assertEquals("ㅅㅏㄱㅘ", result);
+        assertEquals("ㅅㅏㄱㅗㅏ", result);
     }
 
     @Test

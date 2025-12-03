@@ -50,9 +50,9 @@ class HangulModifierTest {
     }
 
     @Test
-    @DisplayName("removeLastCharacter: 한 글자 -> 빈 문자열")
+    @DisplayName("removeLastCharacter: 한 글자에서 마지막 자모 제거 -> 초성만 남음")
     void testRemoveLastCharacter_singleChar() {
         String result = HangulModifier.removeLastCharacter("가");
-        assertEquals("", result);
+        assertEquals("ㄱ", result);
     }
 }
