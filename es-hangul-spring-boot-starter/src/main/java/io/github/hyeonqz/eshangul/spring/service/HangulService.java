@@ -1,4 +1,4 @@
-package io.github.hyeonqz.eshangul.spring;
+package io.github.hyeonqz.eshangul.spring.service;
 
 import io.github.hyeonqz.eshangul.core.*;
 import io.github.hyeonqz.eshangul.validator.HangulValidator;

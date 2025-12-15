@@ -7,7 +7,7 @@ plugins {
 
 ext {
     groupName = 'io.github.hyeonqz'
-    versionName = '1.0.0'
+    versionName = '1.0.1'
 
     // 배포 대상 모듈 목록
     publishModules = ['es-hangul-core', 'es-hangul-spring-boot-starter']
@@ -27,7 +27,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
