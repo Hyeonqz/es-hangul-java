@@ -1,7 +1,7 @@
 # ES-Hangul Java
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java Version](https://img.shields.io/badge/Java-21%2B-blue.svg)](https://www.oracle.com/java/)
+[![Java Version](https://img.shields.io/badge/Java-17%2B-blue.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0%2B-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
 > A Java/Spring Boot port of [Toss's es-hangul](https://github.com/toss/es-hangul)  
@@ -27,6 +27,7 @@ We aim to bring the same powerful Korean text processing capabilities to the Jav
 - **받침 처리 (Batchim Processing)**: 받침 추가, 제거, 확인
 - **한글 검증 (Hangul Validation)**: 한글 문자 및 완성도 검증
 - **초성/중성/종성 처리**: 개별 자모 요소 처리
+- **한글 로마자 변환 (Hangul Romanization)**: 국립국어원 로마자 표기법 기반 한글→영문 변환
 
 ## Installation
 
@@ -65,21 +66,38 @@ dependencies {
 
 ### For Spring Boot Applications
 
-Spring Boot Starter를 사용하면 `HangulService`가 자동으로 Bean으로 등록됩니다.
+Spring Boot Starter를 사용하면 `HangulService`와 `RomanizeService`가 자동으로 Bean으로 등록됩니다.
 
 ```java
 @RestController
 public class HangulController {
 
     private final HangulService hangulService;
+    private final RomanizeService romanizeService;
 
-    public HangulController(HangulService hangulService) {
+    public HangulController(HangulService hangulService, RomanizeService romanizeService) {
         this.hangulService = hangulService;
+        this.romanizeService = romanizeService;
     }
 
     @GetMapping("/josa")
     public String addJosa(@RequestParam String word) {
         return hangulService.josa(word, HangulJosa.JosaOption.이_가);
+    }
+
+    @GetMapping("/romanize")
+    public String romanize(@RequestParam String hangul) {
+        return romanizeService.romanize(hangul);
+    }
+
+    @GetMapping("/romanize/name")
+    public String romanizeName(@RequestParam String name) {
+        return romanizeService.romanizeNameTypical(name);
+    }
+
+    @GetMapping("/romanize/district")
+    public String romanizeDistrict(@RequestParam String district) {
+        return romanizeService.romanizeDistrict(district);
     }
 }
 ```
@@ -163,6 +181,34 @@ System.out.println(canBeJungseong); // true
 System.out.println(canBeJongseong); // true
 ```
 
+### 한글 로마자 변환 (Romanization)
+```java
+import io.github.hyeonqz.eshangul.romanizer.HangulRomanizer;
+import io.github.hyeonqz.eshangul.romanizer.RomanizedCharacter;
+
+// 기본 로마자 변환
+String result1 = HangulRomanizer.romanize("안녕하세요");
+System.out.println(result1); // "Annyeonghaseyo"
+
+String result2 = HangulRomanizer.romanize("대한민국");
+System.out.println(result2); // "Daehanmin-guk"
+
+// 자음 동화 옵션
+String regressive = HangulRomanizer.romanize("신라면", RomanizedCharacter.ConsonantAssimilation.Regressive);
+System.out.println(regressive); // "Sillamyeon"
+
+String progressive = HangulRomanizer.romanize("신라면", RomanizedCharacter.ConsonantAssimilation.Progressive);
+System.out.println(progressive); // "Sinnamyeon"
+
+// 지명 변환
+String district = HangulRomanizer.romanize("강남구", RomanizedCharacter.Type.District);
+System.out.println(district); // "Gangnam-gu"
+
+// 인명 변환 (흔한 성씨 표기)
+String name = HangulRomanizer.romanize("박보검", RomanizedCharacter.Type.NameTypical);
+System.out.println(name); // "Park Bogeom"
+```
+
 ## Examples
 
 더 많은 예시는 [es-hangul-examples](./es-hangul-examples/src/main/java/io/github/hyeonqz/eshangul/examples/) 모듈을 참고하세요.
@@ -185,6 +231,7 @@ java SimpleExample.java
 - `HangulJosaExample.java`: 조사 처리 기능 예시
 - `HangulBatchimExample.java`: 받침 처리 기능 예시
 - `HangulValidatorExample.java`: 한글 검증 기능 예시
+- `HangulRomanizerExample.java`: 한글 로마자 변환 기능 예시
 - `ComprehensiveExample.java`: 종합 사용 예시
 - `SimpleExample.java`: 기본 사용법 안내
 
@@ -193,25 +240,44 @@ java SimpleExample.java
 ### Core Classes
 
 - `HangulAssembler`: 한글 조립 기능
-- `HangulDisassembler`: 한글 분해 기능  
+- `HangulDisassembler`: 한글 분해 기능
 - `HangulJosa`: 조사 처리 기능
 - `HangulBatchim`: 받침 처리 기능
 - `HangulValidator`: 한글 검증 기능
+- `HangulRomanizer`: 한글 로마자 변환 기능
 
 ### Supported Josa Options
 
 - `이_가`: 이/가
-- `을_를`: 을/를  
+- `을_를`: 을/를
 - `은_는`: 은/는
 - `으로_로`: 으로/로
 - `와_과`: 와/과
 - `이나_나`: 이나/나
+
+### Romanization Options
+
+#### Consonant Assimilation (자음 동화)
+- `Progressive`: 순행 동화
+- `Regressive`: 역행 동화 (기본값)
+
+#### Word Types (단어 타입)
+- `Typical`: 일반 단어 (기본값)
+- `Substantives`: 체언 (받침 뒤 'ㅎ'을 밝혀 적기)
+- `Compound`: 합성어 (ㄴ 첨가)
+- `District`: 지명 (행정구역 표기)
+- `Name`: 인명 (성과 이름 분리)
+- `NameTypical`: 인명 (흔한 성씨 표기법 적용)
 
 ## Credits
 
 This project is inspired by and maintains API compatibility with:
 - [es-hangul](https://github.com/toss/es-hangul) - Original JavaScript implementation by Toss team
 - Special thanks to the Toss Frontend Chapter for their excellent work on Korean text processing
+
+The romanization feature is based on:
+- [korean-romanizer](https://github.com/crizin/korean-romanizer) - Korean romanization library by crizin
+- Implements the National Korean Language Romanization standard
 
 ## Thanks to
 
